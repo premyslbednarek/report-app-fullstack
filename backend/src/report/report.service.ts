@@ -4,6 +4,7 @@ import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Report } from '@prisma/client';
+import { ReportOutDto, ReportWithFiles } from './dto/report-out.dto';
 
 @Injectable()
 export class ReportService {
@@ -15,20 +16,30 @@ export class ReportService {
   async create(
     data: CreateReportDto,
     files: Express.Multer.File[],
-  ): Promise<Report> {
-    const report = await this.prisma.report.create({ data });
-    for (const file of files) {
-      await this.fileService.create(file, report.id);
-    }
-    return report;
+  ): Promise<ReportWithFiles> {
+    return this.prisma.report.create({
+      data: {
+        ...data,
+        files: {
+          create: files.map((file) => ({
+            name: file.originalname,
+            diskName: file.filename,
+          })),
+        },
+      },
+      include: { files: true },
+    });
   }
 
-  async findAll(): Promise<Report[]> {
-    return this.prisma.report.findMany();
+  async findAll(): Promise<ReportWithFiles[]> {
+    return this.prisma.report.findMany({ include: { files: true } });
   }
 
-  async findOne(id: string): Promise<Report | null> {
-    return this.prisma.report.findUnique({ where: { id } });
+  async findOne(id: string): Promise<ReportWithFiles | null> {
+    return this.prisma.report.findUnique({
+      where: { id },
+      include: { files: true },
+    });
   }
 
   update(id: string, data: UpdateReportDto): Promise<Report> {

@@ -7,18 +7,35 @@ import {
   Param,
   Delete,
   NotFoundException,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { ReportService } from './report.service';
-import { CreateReportDto } from './dto/create-report.dto';
+import {
+  CreateReportDto,
+  CreateReportWithFilesDto,
+} from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { Report } from '@prisma/client';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('report')
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
   @Post()
-  create(@Body() createReportDto: CreateReportDto) {
+  @UseInterceptors(FilesInterceptor('files'))
+  @ApiBody({ type: CreateReportWithFilesDto })
+  @ApiConsumes('multipart/form-data')
+  create(
+    @Body() createReportDto: CreateReportDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    // since we are using multipart data, everything is a string
+    createReportDto.authorAge = Number(createReportDto.authorAge);
+    console.log('Dto: ', createReportDto);
+    console.log('Files: ', files);
     return this.reportService.create(createReportDto);
   }
 

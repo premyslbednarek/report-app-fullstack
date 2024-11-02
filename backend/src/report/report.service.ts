@@ -8,8 +8,8 @@ import { Report } from '@prisma/client';
 export class ReportService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createReportDto: CreateReportDto): Promise<Report> {
-    return this.prisma.report.create({ data: createReportDto });
+  create(data: CreateReportDto): Promise<Report> {
+    return this.prisma.report.create({ data });
   }
 
   async findAll(): Promise<Report[]> {
@@ -20,8 +20,8 @@ export class ReportService {
     return this.prisma.report.findUnique({ where: { id } });
   }
 
-  update(id: string, updateReportDto: UpdateReportDto): Promise<Report> {
-    return this.prisma.report.update({ where: { id }, data: updateReportDto });
+  update(id: string, data: UpdateReportDto): Promise<Report> {
+    return this.prisma.report.update({ where: { id }, data });
   }
 
   remove(id: string) {

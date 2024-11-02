@@ -10,3 +10,8 @@ export class CreateReportDto {
   @ApiProperty({ example: 30 })
   authorAge: number;
 }
+
+export class CreateReportWithFilesDto extends CreateReportDto {
+  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
+  files: any[];
+}

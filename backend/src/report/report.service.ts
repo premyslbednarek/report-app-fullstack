@@ -71,7 +71,11 @@ export class ReportService {
     });
   }
 
-  remove(id: string) {
-    return this.prisma.report.delete({ where: { id } });
+  async remove(id: string) {
+    const deleteFiles = this.prisma.file.deleteMany({
+      where: { reportId: id },
+    });
+    const deleteReport = this.prisma.report.delete({ where: { id } });
+    await this.prisma.$transaction([deleteFiles, deleteReport]);
   }
 }

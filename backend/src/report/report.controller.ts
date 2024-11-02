@@ -15,7 +15,10 @@ import {
   CreateReportDto,
   CreateReportWithFilesDto,
 } from './dto/create-report.dto';
-import { UpdateReportDto } from './dto/update-report.dto';
+import {
+  UpdateReportDto,
+  UpdateReportWithFilesDto,
+} from './dto/update-report.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
 import { multerConfig } from 'src/multer.config';
@@ -59,8 +62,19 @@ export class ReportController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReportDto: UpdateReportDto) {
-    return this.reportService.update(id, updateReportDto);
+  @UseInterceptors(FilesInterceptor('files', 100, multerConfig))
+  @ApiOkResponse({ type: ReportOutDto })
+  @ApiBody({ type: UpdateReportWithFilesDto })
+  @ApiConsumes('multipart/form-data')
+  async update(
+    @Param('id') id: string,
+    @Body() updateReportDto: UpdateReportDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    updateReportDto.authorAge = Number(updateReportDto.authorAge);
+    console.log(updateReportDto);
+    const report = await this.reportService.update(id, updateReportDto, files);
+    return ReportOutDto.fromEntity(report);
   }
 
   @Delete(':id')

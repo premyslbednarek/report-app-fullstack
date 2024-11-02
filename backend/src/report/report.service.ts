@@ -1,10 +1,9 @@
 import { FileService } from './../file/file.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Report } from '@prisma/client';
-import { ReportOutDto, ReportWithFiles } from './dto/report-out.dto';
+import { ReportWithFiles } from './dto/report-out.dto';
 
 @Injectable()
 export class ReportService {
@@ -42,8 +41,34 @@ export class ReportService {
     });
   }
 
-  update(id: string, data: UpdateReportDto): Promise<Report> {
-    return this.prisma.report.update({ where: { id }, data });
+  async update(
+    id: string,
+    data: UpdateReportDto,
+    files: Express.Multer.File[],
+  ): Promise<ReportWithFiles> {
+    const { filesToDelete, ...reportData } = data;
+
+    for (const fileId of filesToDelete.split(',')) {
+      try {
+        await this.prisma.file.delete({ where: { id: fileId } });
+      } catch {
+        throw new NotFoundException(`File with id ${fileId} not found`);
+      }
+    }
+
+    return this.prisma.report.update({
+      where: { id },
+      data: {
+        ...reportData,
+        files: {
+          create: files.map((file) => ({
+            name: file.originalname,
+            diskName: file.filename,
+          })),
+        },
+      },
+      include: { files: true },
+    });
   }
 
   remove(id: string) {

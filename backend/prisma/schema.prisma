@@ -6,3 +6,23 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Report {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  description String
+  authorName  String
+  authorAge   Int
+  files       File[]
+}
+
+model File {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  name      String // original file name as the file was uploaded
+  diskName  String // filename on our storage device
+  report    Report   @relation(fields: [reportId], references: [id])
+  reportId  String
+}

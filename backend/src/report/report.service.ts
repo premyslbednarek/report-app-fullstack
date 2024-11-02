@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Report } from '@prisma/client';
 
 @Injectable()
 export class ReportService {
@@ -11,19 +12,19 @@ export class ReportService {
     return 'This action adds a new report';
   }
 
-  findAll() {
-    return `This action returns all report`;
+  async findAll(): Promise<Report[]> {
+    return this.prisma.report.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} report`;
+  async findOne(id: string): Promise<Report | null> {
+    return this.prisma.report.findUnique({ where: { id } });
   }
 
-  update(id: number, updateReportDto: UpdateReportDto) {
+  update(id: string, updateReportDto: UpdateReportDto) {
     return `This action updates a #${id} report`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} report`;
+  remove(id: string) {
+    return this.prisma.report.delete({ where: { id } });
   }
 }

@@ -19,13 +19,14 @@ import { UpdateReportDto } from './dto/update-report.dto';
 import { Report } from '@prisma/client';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { multerConfig } from 'src/multer.config';
 
 @Controller('report')
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(FilesInterceptor('files', 100, multerConfig))
   @ApiBody({ type: CreateReportWithFilesDto })
   @ApiConsumes('multipart/form-data')
   create(
@@ -34,9 +35,8 @@ export class ReportController {
   ) {
     // since we are using multipart data, everything is a string
     createReportDto.authorAge = Number(createReportDto.authorAge);
-    console.log('Dto: ', createReportDto);
-    console.log('Files: ', files);
-    return this.reportService.create(createReportDto);
+
+    return this.reportService.create(createReportDto, files);
   }
 
   @Get()

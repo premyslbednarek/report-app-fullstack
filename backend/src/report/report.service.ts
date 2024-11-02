@@ -1,3 +1,4 @@
+import { FileService } from './../file/file.service';
 import { Injectable } from '@nestjs/common';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
@@ -6,10 +7,20 @@ import { Report } from '@prisma/client';
 
 @Injectable()
 export class ReportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly fileService: FileService,
+  ) {}
 
-  create(data: CreateReportDto): Promise<Report> {
-    return this.prisma.report.create({ data });
+  async create(
+    data: CreateReportDto,
+    files: Express.Multer.File[],
+  ): Promise<Report> {
+    const report = await this.prisma.report.create({ data });
+    for (const file of files) {
+      await this.fileService.create(file, report.id);
+    }
+    return report;
   }
 
   async findAll(): Promise<Report[]> {

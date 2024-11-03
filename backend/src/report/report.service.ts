@@ -46,14 +46,10 @@ export class ReportService {
     data: UpdateReportDto,
     files: Express.Multer.File[],
   ): Promise<ReportWithFiles> {
-    const { filesToDelete, ...reportData } = data;
+    const { fileToDelete, ...reportData } = data;
 
-    for (const fileId of filesToDelete.split(',')) {
-      try {
-        await this.prisma.file.delete({ where: { id: fileId } });
-      } catch {
-        throw new NotFoundException(`File with id ${fileId} not found`);
-      }
+    if (fileToDelete) {
+      await this.prisma.file.delete({ where: { id: fileToDelete } });
     }
 
     return this.prisma.report.update({

@@ -7,7 +7,7 @@ export type UpdateReportWithFilesDto = {
     description?: string;
     authorName?: string;
     authorAge?: number;
-    filesToDelete: string;
-    files: Array<Blob>;
+    fileToDelete?: string;
+    files?: Array<Blob>;
 };
 

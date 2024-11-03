@@ -18,18 +18,20 @@ const ReportTable = () => {
     queryFn: async () => ReportService.reportControllerFindAll(),
   });
 
-  const [selectedReport, setSelectedReport] = useState<ReportOutDto | null>(
-    null
-  );
+  const [selectedReportId, setSelectedReportId] = useState<
+    ReportOutDto["id"] | null
+  >(null);
+  const selectedReport = data?.find((report) => report.id === selectedReportId);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = (report: ReportOutDto) => {
-    setSelectedReport(report);
+    setSelectedReportId(report.id);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setSelectedReport(null);
+    setSelectedReportId(null);
     setIsModalOpen(false);
   };
 

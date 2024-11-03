@@ -71,7 +71,9 @@ export class ReportController {
     @Body() updateReportDto: UpdateReportDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    updateReportDto.authorAge = Number(updateReportDto.authorAge);
+    if (updateReportDto.authorAge) {
+      updateReportDto.authorAge = Number(updateReportDto.authorAge);
+    }
     console.log(updateReportDto);
     const report = await this.reportService.update(id, updateReportDto, files);
     return ReportOutDto.fromEntity(report);

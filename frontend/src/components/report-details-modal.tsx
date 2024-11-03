@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "./ui/dialog"; // Import shadcn Dialog components
-import { Download } from "lucide-react";
+import { Download, Trash } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,7 +18,13 @@ interface ReportDetailsModalProps {
   report: ReportOutDto;
 }
 
-const ShowFiles = ({ files }: { files: ReportOutDto["files"] }) => {
+const ShowFiles = ({
+  files,
+  onFileDelete,
+}: {
+  files: ReportOutDto["files"];
+  onFileDelete: (fileId: string) => void;
+}) => {
   if (files.length === 0) {
     return <div>No files attached</div>;
   }
@@ -29,7 +35,7 @@ const ShowFiles = ({ files }: { files: ReportOutDto["files"] }) => {
       </h1>
       <ul>
         {files.map((file) => (
-          <li key={file.id}>
+          <li key={file.id} className="flex gap-1">
             <a
               href={`/files/${file.id}`}
               download={file.name}
@@ -37,6 +43,13 @@ const ShowFiles = ({ files }: { files: ReportOutDto["files"] }) => {
             >
               <Download className="mr-2" /> {file.name}
             </a>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => onFileDelete(file.id)}
+            >
+              <Trash />
+            </Button>
           </li>
         ))}
       </ul>
@@ -70,6 +83,22 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
     deleteMutation.mutate();
   };
 
+  // Mutation for deleting a single file
+  const deleteFileMutation = useMutation({
+    mutationFn: async (fileId: string) => {
+      return await ReportService.reportControllerUpdate(report.id, {
+        fileToDelete: fileId,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reports"] });
+      toast({ description: "File deleted successfully!" });
+    },
+    onError: () => {
+      toast({ description: "Error while deleting the file!" });
+    },
+  });
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -95,7 +124,10 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
               {new Date(report.createdAt).toLocaleString()}
             </p>
 
-            <ShowFiles files={report.files} />
+            <ShowFiles
+              files={report.files}
+              onFileDelete={deleteFileMutation.mutate}
+            />
           </div>
           <DialogFooter className="flex items-center">
             <Button

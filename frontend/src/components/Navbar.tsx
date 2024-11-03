@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
+import NewReportButton from "./new-report-button";
 
 export const Navbar = () => {
   return (
@@ -14,11 +13,7 @@ export const Navbar = () => {
             Reports
           </Link>
         </div>
-        <Link to="/new" className="mx-2">
-          <Button>
-            <Plus /> New Report
-          </Button>
-        </Link>
+        <NewReportButton />
       </nav>
     </>
   );

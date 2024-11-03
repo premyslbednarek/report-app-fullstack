@@ -1,3 +1,4 @@
+import NewReportButton from "@/components/new-report-button";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -8,9 +9,7 @@ const FrontPage = () => {
       <Link to="/reports">
         <Button>Browse reports</Button>
       </Link>
-      <Link to="/new">
-        <Button>Create new report</Button>
-      </Link>
+      <NewReportButton />
     </div>
   );
 };

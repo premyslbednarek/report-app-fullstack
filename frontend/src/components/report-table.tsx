@@ -11,6 +11,7 @@ import {
 import { Button } from "./ui/button";
 import { useState } from "react";
 import ReportDetailsModal from "./report-details-modal";
+import NewReportButton from "./new-report-button";
 
 const ReportTable = () => {
   const { data, isLoading, isError } = useQuery({
@@ -41,6 +42,15 @@ const ReportTable = () => {
 
   if (isError) {
     return <div>Error</div>;
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-1">
+        <p>No reports found!</p>
+        <NewReportButton />
+      </div>
+    );
   }
 
   return (

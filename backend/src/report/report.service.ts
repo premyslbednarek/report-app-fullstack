@@ -45,23 +45,25 @@ export class ReportService {
   ): Promise<ReportWithFiles> {
     const { fileToDelete, ...reportData } = data;
 
-    if (fileToDelete) {
-      await this.prisma.file.delete({ where: { id: fileToDelete } });
-    }
+    return this.prisma.$transaction(async (prisma) => {
+      if (fileToDelete) {
+        await prisma.file.delete({ where: { id: fileToDelete } });
+      }
 
-    return this.prisma.report.update({
-      where: { id },
-      data: {
-        ...reportData,
-        files: {
-          create: files.map((file) => ({
-            name: file.originalname,
-            diskName: file.filename,
-            mimeType: file.mimetype,
-          })),
+      return prisma.report.update({
+        where: { id },
+        data: {
+          ...reportData,
+          files: {
+            create: files.map((file) => ({
+              name: file.originalname,
+              diskName: file.filename,
+              mimeType: file.mimetype,
+            })),
+          },
         },
-      },
-      include: { files: true },
+        include: { files: true },
+      });
     });
   }
 

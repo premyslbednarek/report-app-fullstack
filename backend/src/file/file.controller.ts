@@ -13,6 +13,7 @@ export class FileController {
     const file = createReadStream(join('uploads', fileEntity.diskName));
     return new StreamableFile(file, {
       disposition: `attachment; filename="${fileEntity.name}"`,
+      type: fileEntity.mimeType,
     });
   }
 }

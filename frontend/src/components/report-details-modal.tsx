@@ -20,6 +20,7 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { useForm } from "react-hook-form";
 import { Label } from "./ui/label";
+import { BASE_URL } from "@/main";
 
 interface ReportDetailsModalProps {
   isOpen: boolean;
@@ -49,7 +50,7 @@ const ShowFiles = ({
         {files.map((file) => (
           <li key={file.id} className="flex gap-1">
             <a
-              href={`/files/${file.id}`}
+              href={`${BASE_URL}/file/${file.id}`}
               download={file.name}
               className="text-blue-500 flex items-center"
             >

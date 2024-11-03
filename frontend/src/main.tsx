@@ -9,7 +9,9 @@ import Reports from "./routes/reports.tsx";
 import NewReport from "./routes/new-report.tsx";
 import App from "./App.tsx";
 
-axios.defaults.baseURL = "http://localhost:3000";
+export const BASE_URL = "http://localhost:3000";
+
+axios.defaults.baseURL = BASE_URL;
 
 const router = createBrowserRouter([
   {

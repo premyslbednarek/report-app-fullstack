@@ -23,6 +23,7 @@ export class ReportService {
           create: files.map((file) => ({
             name: file.originalname,
             diskName: file.filename,
+            mimeType: file.mimetype,
           })),
         },
       },
@@ -60,6 +61,7 @@ export class ReportService {
           create: files.map((file) => ({
             name: file.originalname,
             diskName: file.filename,
+            mimeType: file.mimetype,
           })),
         },
       },

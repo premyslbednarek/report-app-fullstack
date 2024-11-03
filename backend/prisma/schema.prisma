@@ -24,5 +24,6 @@ model File {
   name      String // original file name as the file was uploaded
   diskName  String // filename on our storage device
   report    Report   @relation(fields: [reportId], references: [id])
+  mimeType  String
   reportId  String
 }

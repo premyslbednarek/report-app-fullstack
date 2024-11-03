@@ -11,6 +11,7 @@ export class FileService {
       data: {
         name: file.originalname,
         diskName: file.filename,
+        mimeType: file.mimetype,
         reportId,
       },
     });

@@ -8,6 +8,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { CreateReportWithFilesDto } from './models/CreateReportWithFilesDto';
+export type { FileOutDto } from './models/FileOutDto';
 export type { ReportOutDto } from './models/ReportOutDto';
 export type { UpdateReportWithFilesDto } from './models/UpdateReportWithFilesDto';
 

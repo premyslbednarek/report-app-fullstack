@@ -21,6 +21,6 @@ export class ReportOutDto extends CreateReportDto {
   createdAt: Date;
   @ApiProperty()
   updatedAt: Date;
-  @ApiProperty({ example: [{ id: 'id', name: 'file.txt' }] })
+  @ApiProperty({ type: [FileOutDto] })
   files: FileOutDto[];
 }

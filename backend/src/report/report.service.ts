@@ -1,5 +1,4 @@
-import { FileService } from './../file/file.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,10 +6,7 @@ import { ReportWithFiles } from './dto/report-out.dto';
 
 @Injectable()
 export class ReportService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly fileService: FileService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(
     data: CreateReportDto,

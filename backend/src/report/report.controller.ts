@@ -37,7 +37,7 @@ export class ReportController {
     @Body() createReportDto: CreateReportDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    // since we are using multipart data, everything is a string
+    // convert string to number, since we are using multipart data, where is a string
     createReportDto.authorAge = Number(createReportDto.authorAge);
 
     const report = await this.reportService.create(createReportDto, files);
@@ -74,7 +74,6 @@ export class ReportController {
     if (updateReportDto.authorAge) {
       updateReportDto.authorAge = Number(updateReportDto.authorAge);
     }
-    console.log(updateReportDto);
     const report = await this.reportService.update(id, updateReportDto, files);
     return ReportOutDto.fromEntity(report);
   }

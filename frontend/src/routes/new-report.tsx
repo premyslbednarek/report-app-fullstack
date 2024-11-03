@@ -1,5 +1,7 @@
+import CreateReportForm from "@/components/report-form";
+
 const NewReport = () => {
-  return <div>New Report</div>;
+  return <CreateReportForm />;
 };
 
 export default NewReport;

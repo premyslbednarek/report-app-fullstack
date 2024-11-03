@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  FileOutDto,
   ReportOutDto,
   ReportService,
   UpdateReportWithFilesDto,
@@ -33,6 +34,9 @@ const ShowFiles = ({
   files: ReportOutDto["files"];
   onFileDelete: (fileId: string) => void;
 }) => {
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<FileOutDto | null>(null);
+
   if (files.length === 0) {
     return <div>No files attached</div>;
   }
@@ -54,13 +58,41 @@ const ShowFiles = ({
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => onFileDelete(file.id)}
+              onClick={() => {
+                setIsConfirmOpen(true);
+                setFileToDelete(file);
+              }}
             >
-              <Trash />
+              <Trash /> Delete
             </Button>
           </li>
         ))}
       </ul>
+
+      {/* File deletion confirmation */}
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm File Deletion</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete the following file?</p>
+          <p>File to delete: {fileToDelete?.name}</p>
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (fileToDelete) {
+                  onFileDelete(fileToDelete.id);
+                }
+                setIsConfirmOpen(false);
+              }}
+            >
+              Yes, Delete
+            </Button>
+            <Button onClick={() => setIsConfirmOpen(false)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

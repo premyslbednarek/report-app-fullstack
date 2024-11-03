@@ -5,7 +5,9 @@ const App = () => {
   return (
     <div>
       <Navbar />
-      <Outlet />
+      <div className="container mx-auto">
+        <Outlet />
+      </div>
     </div>
   );
 };

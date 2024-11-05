@@ -2,6 +2,7 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { Textarea } from "../ui/textarea";
 import FormLabel from "./form-label";
+import FormError from "./form-error";
 
 type FormTextAreaProps = React.InputHTMLAttributes<HTMLTextAreaElement> & {
   label: string;
@@ -16,9 +17,7 @@ const FormTextarea = ({ label, name, ...textareaProps }: FormTextAreaProps) => {
       <FormLabel htmlFor={name}>{label}</FormLabel>
       <Textarea id={name} {...textareaProps} {...register(name)} />
       {formState.errors[name] && (
-        <p className="text-red-600">
-          {String(formState.errors[name]?.message)}
-        </p>
+        <FormError>{String(formState.errors[name]?.message)}</FormError>
       )}
     </div>
   );

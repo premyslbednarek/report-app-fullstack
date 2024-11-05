@@ -2,6 +2,7 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "../ui/input";
 import FormLabel from "./form-label";
+import FormError from "./form-error";
 
 type FormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
@@ -20,9 +21,7 @@ const FormInput = ({ label, name, ...inputProps }: FormInputProps) => {
         {...register(name, { valueAsNumber: inputProps.type === "number" })}
       />
       {formState.errors[name] && (
-        <p className="text-red-600">
-          {String(formState.errors[name]?.message)}
-        </p>
+        <FormError>{String(formState.errors[name]?.message)}</FormError>
       )}
     </div>
   );

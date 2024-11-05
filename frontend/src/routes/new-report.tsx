@@ -4,9 +4,11 @@ import ReportForm from "@/components/report-form";
 import { CreateReportSchema } from "@/components/report-form-schema";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const NewReport = () => {
   const { toast } = useToast(); // show toasts - submit success/error
+  const navigate = useNavigate();
 
   const createReportMutation = useMutation({
     mutationFn: async (formData: CreateReportSchema) => {
@@ -14,6 +16,7 @@ const NewReport = () => {
     },
     onSuccess: () => {
       toast({ description: "Report created successfully!" });
+      navigate("/reports");
     },
     onError: () => {
       toast({ description: "There was an error creating the report" });

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { FileOutDto, ReportOutDto, ReportService } from "@/client";
+import { useState } from "react";
+import { ReportOutDto, ReportService } from "@/client";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -7,12 +7,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "./ui/dialog"; // Import shadcn Dialog components
-import { Download, Trash } from "lucide-react";
+} from "./ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { BASE_URL } from "@/main";
 import EditableReportDisplay from "./editable-report-display";
+import FileList from "./file-list";
 
 interface ReportDetailsModalProps {
   isOpen: boolean;
@@ -20,86 +19,17 @@ interface ReportDetailsModalProps {
   report: ReportOutDto;
 }
 
-const ShowFiles = ({
-  files,
-  onFileDelete,
-}: {
-  files: ReportOutDto["files"];
-  onFileDelete: (fileId: string) => void;
-}) => {
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [fileToDelete, setFileToDelete] = useState<FileOutDto | null>(null);
-
-  if (files.length === 0) {
-    return <div>No files attached</div>;
-  }
-  return (
-    <>
-      <h1>
-        <strong>Files</strong>
-      </h1>
-      <ul className="flex flex-col gap-1">
-        {files.map((file) => (
-          <li key={file.id} className="flex gap-1">
-            <a
-              href={`${BASE_URL}/file/${file.id}`}
-              download={file.name}
-              className="text-blue-500 flex items-center"
-            >
-              <Download className="mr-2" /> {file.name}
-            </a>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => {
-                setIsConfirmOpen(true);
-                setFileToDelete(file);
-              }}
-            >
-              <Trash /> Delete
-            </Button>
-          </li>
-        ))}
-      </ul>
-
-      {/* File deletion confirmation */}
-      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm File Deletion</DialogTitle>
-          </DialogHeader>
-          <p>Are you sure you want to delete the following file?</p>
-          <p>File to delete: {fileToDelete?.name}</p>
-          <DialogFooter>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (fileToDelete) {
-                  onFileDelete(fileToDelete.id);
-                }
-                setIsConfirmOpen(false);
-              }}
-            >
-              Yes, Delete
-            </Button>
-            <Button onClick={() => setIsConfirmOpen(false)}>Cancel</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
-
-const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
+const ReportDetailsModal = ({
   isOpen,
   onClose,
   report,
-}) => {
+}: ReportDetailsModalProps) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const deleteMutation = useMutation({
+  // mutation for deleting the report
+  const deleteReportMutation = useMutation({
     mutationFn: async () =>
       await ReportService.reportControllerRemove(report.id),
     onSuccess: () => {
@@ -109,26 +39,6 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
     },
     onError: () => {
       alert("Failed to delete the report.");
-    },
-  });
-
-  const handleDelete = () => {
-    deleteMutation.mutate();
-  };
-
-  // Mutation for deleting a single file
-  const deleteFileMutation = useMutation({
-    mutationFn: async (fileId: string) => {
-      return await ReportService.reportControllerUpdate(report.id, {
-        fileToDelete: fileId,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reports"] });
-      toast({ description: "File deleted successfully!" });
-    },
-    onError: () => {
-      toast({ description: "Error while deleting the file!" });
     },
   });
 
@@ -142,10 +52,8 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 
           <EditableReportDisplay report={report} />
 
-          <ShowFiles
-            files={report.files}
-            onFileDelete={deleteFileMutation.mutate}
-          />
+          <FileList report={report} />
+
           <DialogFooter className="flex items-center">
             <Button
               variant="destructive"
@@ -166,7 +74,10 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
           </DialogHeader>
           <p>Are you sure you want to delete this report?</p>
           <DialogFooter className="flex justify-between">
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button
+              variant="destructive"
+              onClick={() => deleteReportMutation.mutate()}
+            >
               Yes, Delete
             </Button>
             <Button onClick={() => setIsConfirmOpen(false)}>Cancel</Button>

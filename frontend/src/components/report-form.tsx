@@ -4,18 +4,34 @@ import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "./form/form-input";
 import FormTextarea from "./form/form-textarea";
+import { z } from "zod";
+
+const createReportSchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  description: z.string().min(1, { message: "Description is required" }),
+  authorName: z.string(),
+  authorAge: z
+    .number({ message: "Plese enter your age" })
+    .int()
+    .positive({ message: "Age must be a positive number" }),
+  files: z.instanceof(FileList).transform((files) => Array.from(files)),
+});
+
+type CreateReportSchema = z.infer<typeof createReportSchema>;
 
 const CreateReportForm = () => {
   const { toast } = useToast(); // show toasts - submit success/error
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<CreateReportWithFilesDto>();
+  const form = useForm<CreateReportSchema>({
+    resolver: zodResolver(createReportSchema),
+  });
 
   const onSubmit = async (data: CreateReportWithFilesDto) => {
     try {
-      data.files = Array.from(data.files); // convert FileList to Array
       setIsSubmitting(true);
       await ReportService.reportControllerCreate(data);
       toast({ description: "Report created successfully!" });

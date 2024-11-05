@@ -3,35 +3,11 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import axios from "axios";
 import Providers from "./providers.tsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import FrontPage from "./routes/root.tsx";
-import Reports from "./routes/reports.tsx";
-import NewReport from "./routes/new-report.tsx";
-import App from "./App.tsx";
+import router from "./router.tsx";
+import { RouterProvider } from "react-router-dom";
 
 export const BASE_URL = "/api";
 axios.defaults.baseURL = BASE_URL;
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        path: "/",
-        element: <FrontPage />,
-      },
-      {
-        path: "/reports",
-        element: <Reports />,
-      },
-      {
-        path: "/new",
-        element: <NewReport />,
-      },
-    ],
-  },
-]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

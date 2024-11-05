@@ -9,7 +9,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import ReportDetailsModal from "./report-details-modal";
 import NewReportButton from "./new-report-button";
 
@@ -36,6 +42,40 @@ const ReportTable = () => {
     setIsModalOpen(false);
   };
 
+  const columns = useMemo<ColumnDef<ReportOutDto, string>[]>(
+    () => [
+      {
+        header: "Title",
+        accessorKey: "title",
+      },
+      {
+        header: "Author Name",
+        accessorKey: "authorName",
+      },
+      {
+        header: "Updated At",
+        accessorKey: "updatedAt",
+        cell: ({ getValue }) => {
+          const date = new Date(getValue() as string);
+          return date.toLocaleString();
+        },
+      },
+      {
+        header: "Actions",
+        cell: ({ row }) => (
+          <Button onClick={() => openModal(row.original)}>View</Button>
+        ),
+      },
+    ],
+    []
+  );
+
+  const table = useReactTable({
+    data: data || [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -57,24 +97,29 @@ const ReportTable = () => {
     <>
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Report title</TableHead>
-            <TableHead>Report author</TableHead>
-            <TableHead>Created at</TableHead>
-            <TableHead className="w-[50px]">Report details</TableHead>
-          </TableRow>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
         </TableHeader>
         <TableBody>
-          {data?.map((report) => (
-            <TableRow key={report.id}>
-              <TableCell>{report.title}</TableCell>
-              <TableCell>{report.authorName}</TableCell>
-              <TableCell>
-                {new Date(report.createdAt).toLocaleString()}
-              </TableCell>
-              <TableCell>
-                <Button onClick={() => openModal(report)}>Open details</Button>
-              </TableCell>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
             </TableRow>
           ))}
         </TableBody>

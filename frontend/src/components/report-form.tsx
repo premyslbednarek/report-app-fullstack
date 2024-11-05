@@ -29,11 +29,7 @@ const ReportForm = ({ onFormSubmit, defaultValues, ...props }: FormProps) => {
 
   return (
     <FormProvider {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        {...props}
-        className="max-w-lg mx-auto p-5 shadow-md rounded-md space-y-2 border border-gray-300"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} {...props}>
         <FormInput
           label="Title"
           name="title"
@@ -43,7 +39,7 @@ const ReportForm = ({ onFormSubmit, defaultValues, ...props }: FormProps) => {
           label="Description"
           name="description"
           placeholder="Enter report description"
-          className="h-[300px]"
+          className="h-[200px]"
         />
         <FormInput
           label="Author Name"
@@ -58,7 +54,7 @@ const ReportForm = ({ onFormSubmit, defaultValues, ...props }: FormProps) => {
         />
         <FormInput label="Upload Files" name="files" type="file" multiple />
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="w-full mt-3" disabled={isSubmitting}>
           {isSubmitting ? <Loader2 /> : "Submit"}
         </Button>
       </form>

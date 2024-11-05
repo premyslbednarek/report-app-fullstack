@@ -1,4 +1,5 @@
 import { ReportService } from "@/client";
+import Card from "@/components/card";
 import ReportForm from "@/components/report-form";
 import { CreateReportSchema } from "@/components/report-form-schema";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +16,11 @@ const NewReport = () => {
     }
   };
 
-  return <ReportForm onFormSubmit={onSubmit} />;
+  return (
+    <Card>
+      <ReportForm onFormSubmit={onSubmit} />
+    </Card>
+  );
 };
 
 export default NewReport;

@@ -14,6 +14,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import ReportDetailsModal from "./report-details-modal";
@@ -74,6 +75,10 @@ const ReportTable = () => {
     data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    initialState: {
+      sorting: [{ id: "updatedAt", desc: true }],
+    },
   });
 
   if (isLoading) {

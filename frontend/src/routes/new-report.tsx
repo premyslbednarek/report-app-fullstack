@@ -1,5 +1,6 @@
 import { ReportService } from "@/client";
-import CreateReportForm, { CreateReportSchema } from "@/components/report-form";
+import CreateReportForm from "@/components/report-form";
+import { CreateReportSchema } from "@/components/report-form-schema";
 import { useToast } from "@/hooks/use-toast";
 
 const NewReport = () => {

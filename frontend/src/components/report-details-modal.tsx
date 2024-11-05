@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  FileOutDto,
-  ReportOutDto,
-  ReportService,
-  UpdateReportWithFilesDto,
-} from "@/client";
+import { FileOutDto, ReportOutDto, ReportService } from "@/client";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -13,12 +8,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from "./ui/dialog"; // Import shadcn Dialog components
-import { Download, Edit, Trash } from "lucide-react";
+import { Download, Trash } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { BASE_URL } from "@/main";
-import ReportForm from "./report-form";
-import { CreateReportSchema } from "./report-form-schema";
+import EditableReportDisplay from "./editable-report-display";
 
 interface ReportDetailsModalProps {
   isOpen: boolean;
@@ -105,20 +99,6 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const [isEditing, setIsEditing] = useState(false);
-
-  const updateReportMutation = useMutation({
-    mutationFn: async (data: UpdateReportWithFilesDto) =>
-      await ReportService.reportControllerUpdate(report.id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reports"] });
-      toast({ description: "Report updated successfully!" });
-    },
-    onError: () => {
-      toast({ description: "Error while updating the report!" });
-    },
-  });
-
   const deleteMutation = useMutation({
     mutationFn: async () =>
       await ReportService.reportControllerRemove(report.id),
@@ -160,27 +140,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
             <DialogTitle>Report Details</DialogTitle>
           </DialogHeader>
 
-          <ReportForm
-            isEditing={isEditing}
-            onFormSubmit={async (data: CreateReportSchema) => {
-              updateReportMutation.mutate(data);
-              setIsEditing(false);
-            }}
-            defaultValues={{
-              title: report.title,
-              description: report.description,
-              authorName: report.authorName,
-              authorAge: report.authorAge,
-            }}
-          />
-
-          {!isEditing && (
-            <>
-              <Button className="mt-3" onClick={() => setIsEditing(!isEditing)}>
-                <Edit /> Edit Report
-              </Button>
-            </>
-          )}
+          <EditableReportDisplay report={report} />
 
           <ShowFiles
             files={report.files}

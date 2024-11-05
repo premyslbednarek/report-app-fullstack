@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "./ui/dialog"; // Import shadcn Dialog components
-import { Download, Trash } from "lucide-react";
+import { Download, Edit, Trash } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { BASE_URL } from "@/main";
@@ -105,6 +105,8 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  const [isEditing, setIsEditing] = useState(false);
+
   const updateReportMutation = useMutation({
     mutationFn: async (data: UpdateReportWithFilesDto) =>
       await ReportService.reportControllerUpdate(report.id, data),
@@ -159,8 +161,10 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
           </DialogHeader>
 
           <ReportForm
+            isEditing={isEditing}
             onFormSubmit={async (data: CreateReportSchema) => {
               updateReportMutation.mutate(data);
+              setIsEditing(false);
             }}
             defaultValues={{
               title: report.title,
@@ -169,6 +173,14 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
               authorAge: report.authorAge,
             }}
           />
+
+          {!isEditing && (
+            <>
+              <Button className="mt-3" onClick={() => setIsEditing(!isEditing)}>
+                <Edit /> Edit Report
+              </Button>
+            </>
+          )}
 
           <ShowFiles
             files={report.files}

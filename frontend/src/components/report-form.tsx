@@ -10,9 +10,17 @@ import { createReportSchema, CreateReportSchema } from "./report-form-schema";
 type FormProps = {
   onFormSubmit: (formData: CreateReportSchema) => Promise<void>;
   defaultValues?: Omit<CreateReportSchema, "files">;
+  // when isEditing is false, the form will be read-only
+  // the user won't be able to submit the form and upload files
+  isEditing?: boolean;
 } & React.FormHTMLAttributes<HTMLFormElement>;
 
-const ReportForm = ({ onFormSubmit, defaultValues, ...props }: FormProps) => {
+const ReportForm = ({
+  onFormSubmit,
+  defaultValues,
+  isEditing = true,
+  ...props
+}: FormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   console.log(defaultValues);
 
@@ -34,16 +42,19 @@ const ReportForm = ({ onFormSubmit, defaultValues, ...props }: FormProps) => {
           label="Title"
           name="title"
           placeholder="Enter report title"
+          disabled={!isEditing}
         />
         <FormTextarea
           label="Description"
           name="description"
           placeholder="Enter report description"
           className="h-[200px]"
+          disabled={!isEditing}
         />
         <FormInput
           label="Author Name"
           name="authorName"
+          disabled={!isEditing}
           placeholder="Enter your name"
         />
         <FormInput
@@ -51,12 +62,22 @@ const ReportForm = ({ onFormSubmit, defaultValues, ...props }: FormProps) => {
           name="authorAge"
           type="number"
           placeholder="Enter your age"
+          disabled={!isEditing}
         />
-        <FormInput label="Upload Files" name="files" type="file" multiple />
 
-        <Button type="submit" className="w-full mt-3" disabled={isSubmitting}>
-          {isSubmitting ? <Loader2 /> : "Submit"}
-        </Button>
+        {isEditing && (
+          <>
+            <FormInput label="Upload Files" name="files" type="file" multiple />
+
+            <Button
+              type="submit"
+              className="w-full mt-3"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? <Loader2 /> : "Submit"}
+            </Button>
+          </>
+        )}
       </form>
     </FormProvider>
   );

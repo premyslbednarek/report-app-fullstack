@@ -16,11 +16,9 @@ import {
 import { Download, Trash } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-import { useForm } from "react-hook-form";
-import { Label } from "./ui/label";
 import { BASE_URL } from "@/main";
+import ReportForm from "./report-form";
+import { CreateReportSchema } from "./report-form-schema";
 
 interface ReportDetailsModalProps {
   isOpen: boolean;
@@ -107,35 +105,17 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const { register, handleSubmit, reset } = useForm<UpdateReportWithFilesDto>({
-    defaultValues: {
-      title: report.title,
-      description: report.description,
-      authorName: report.authorName,
-      authorAge: report.authorAge,
-    },
-  });
-
   const updateReportMutation = useMutation({
     mutationFn: async (data: UpdateReportWithFilesDto) =>
       await ReportService.reportControllerUpdate(report.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reports"] });
       toast({ description: "Report updated successfully!" });
-      setIsEditing(false);
     },
     onError: () => {
       toast({ description: "Error while updating the report!" });
     },
   });
-
-  const onSubmit = (data: UpdateReportWithFilesDto) => {
-    if (data.files) {
-      data.files = Array.from(data.files); // convert FileList to Array
-    }
-    updateReportMutation.mutate(data);
-  };
 
   const deleteMutation = useMutation({
     mutationFn: async () =>
@@ -170,87 +150,6 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
     },
   });
 
-  const form = (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-1">
-      <div>
-        <Label htmlFor="title" className="block text-sm font-medium">
-          Title
-        </Label>
-        <Input
-          {...register("title")}
-          disabled={!isEditing}
-          name="title"
-          className="mt-1 block w-full"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="description" className="block text-sm font-medium">
-          Description
-        </Label>
-        <Textarea
-          {...register("description")}
-          disabled={!isEditing}
-          name="description"
-          className="mt-1 block w-full"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="authorName" className="block text-sm font-medium">
-          Author name:
-        </Label>
-        <Input
-          {...register("authorName")}
-          disabled={!isEditing}
-          name="authorName"
-          className="mt-1 block w-full"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="authorAge" className="block text-sm font-medium">
-          Author age:
-        </Label>
-        <Input
-          {...register("authorAge")}
-          disabled={!isEditing}
-          name="authorAge"
-          type="number"
-          className="mt-1 block w-full"
-        />
-      </div>
-
-      {isEditing && (
-        <>
-          <Label htmlFor="files" className="block text-sm font-medium">
-            Add files
-          </Label>
-          <div>
-            <Input {...register("files")} type="file" multiple></Input>
-          </div>
-        </>
-      )}
-
-      <div>
-        {isEditing && (
-          <div className="flex gap-1">
-            <Button type="submit">Save Changes</Button>
-            <Button
-              onClick={() => {
-                setIsEditing(false);
-                reset();
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        )}
-        {!isEditing && <Button onClick={() => setIsEditing(true)}>Edit</Button>}
-      </div>
-    </form>
-  );
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -258,7 +157,19 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
           <DialogHeader>
             <DialogTitle>Report Details</DialogTitle>
           </DialogHeader>
-          {form}
+
+          <ReportForm
+            onFormSubmit={async (data: CreateReportSchema) => {
+              updateReportMutation.mutate(data);
+            }}
+            defaultValues={{
+              title: report.title,
+              description: report.description,
+              authorName: report.authorName,
+              authorAge: report.authorAge,
+            }}
+          />
+
           <ShowFiles
             files={report.files}
             onFileDelete={deleteFileMutation.mutate}

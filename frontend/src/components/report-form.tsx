@@ -9,13 +9,16 @@ import { createReportSchema, CreateReportSchema } from "./report-form-schema";
 
 type FormProps = {
   onFormSubmit: (formData: CreateReportSchema) => Promise<void>;
+  defaultValues?: Omit<CreateReportSchema, "files">;
 } & React.FormHTMLAttributes<HTMLFormElement>;
 
-const CreateReportForm = ({ onFormSubmit, ...props }: FormProps) => {
+const ReportForm = ({ onFormSubmit, defaultValues, ...props }: FormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  console.log(defaultValues);
 
   const form = useForm<CreateReportSchema>({
     resolver: zodResolver(createReportSchema),
+    defaultValues,
   });
 
   const onSubmit = async (formData: CreateReportSchema) => {
@@ -63,4 +66,4 @@ const CreateReportForm = ({ onFormSubmit, ...props }: FormProps) => {
   );
 };
 
-export default CreateReportForm;
+export default ReportForm;

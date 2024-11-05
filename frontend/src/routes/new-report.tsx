@@ -1,5 +1,5 @@
 import { ReportService } from "@/client";
-import CreateReportForm from "@/components/report-form";
+import ReportForm from "@/components/report-form";
 import { CreateReportSchema } from "@/components/report-form-schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,7 +15,7 @@ const NewReport = () => {
     }
   };
 
-  return <CreateReportForm onFormSubmit={onSubmit} />;
+  return <ReportForm onFormSubmit={onSubmit} />;
 };
 
 export default NewReport;
